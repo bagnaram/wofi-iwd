@@ -6,6 +6,14 @@ formatting required because SSIDs can contain any data.
 
 This tool is meant to run in Sway/wlroots based Linux environments.
 
+[[screenshot.jpg]]
+
+* Why
+This was made to make the wifi scanning and connecting experience for IWD users
+more intuitive. A simple menu selection interfare is all I need to quickly
+connect to wifis. I also wanted to ensure full data and UTF-8 support for SSID
+connection, hence the additional scanning script.
+
 * Usage
 
 Simply run the ~wofi-iwd.sh~ script to issue an IWD scan to the target
@@ -19,5 +27,3 @@ interface. It will prompt for PSK passwords if the network is protected.
 * Installation
 You can clone this to ~$HOME/bin~ or some place accessible to you PATH and
 launch it from a kuyboard shortcut or using a ~waybar~ module.
-
-*
