@@ -21,7 +21,7 @@ function rofi() {
     command rofi -m -1 -l 3 -theme solarized -dmenu -i "$@"
 }
 function ssid-scan(){
-    ~/dotfiles/waybar/iwd-scan.py "$@"
+    iwd-scan.py "$@"
 }
 
 case $script in
