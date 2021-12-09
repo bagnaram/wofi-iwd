@@ -1,0 +1,23 @@
+#+TITLE: wofi-iwd
+
+This is a [[https://hg.sr.ht/~scoopta/wofi][Wofi]] (dmunu) interface for iwd for use connecting to networks. It
+comes with a dbus-based helper script to provide raw SSIDs. This is to easen the
+formatting required because SSIDs can contain any data.
+
+This tool is meant to run in Sway/wlroots based Linux environments.
+
+* Usage
+
+Simply run the ~wofi-iwd.sh~ script to issue an IWD scan to the target
+interface. It will prompt for PSK passwords if the network is protected.
+
+* Dependencies
+1. iwd
+2. wofi/rofi
+3. python3
+
+* Installation
+You can clone this to ~$HOME/bin~ or some place accessible to you PATH and
+launch it from a kuyboard shortcut or using a ~waybar~ module.
+
+*
