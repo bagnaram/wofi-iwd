@@ -1,7 +1,7 @@
 #+TITLE: wofi-iwd
 
 This is a [[https://hg.sr.ht/~scoopta/wofi][Wofi]] (dmenu) interface for iwd for use connecting to networks. It
-comes with a dbus-based helper script to provide raw SSIDs. This is to easen the
+comes with a dbus-based helper script to provide raw SSIDs. This is to ease the
 formatting required because SSIDs can contain any data.
 
 This tool is meant to run in Sway/wlroots based Linux environments.
@@ -10,8 +10,8 @@ This tool is meant to run in Sway/wlroots based Linux environments.
 
 * Why
 This was made to make the wifi scanning and connecting experience for IWD users
-more intuitive. A simple menu selection interfare is all I need to quickly
-connect to wifis. I also wanted to ensure full data and UTF-8 support for SSID
+more intuitive. A simple menu selection interface is all I need to quickly
+connect to WIFIs. I also wanted to ensure full data and UTF-8 support for SSID
 connection, hence the additional scanning script.
 
 * Usage

@@ -1,13 +1,16 @@
 #!/usr/bin/env zsh
 
-script=$(basename "$0")
+script=`basename "$0"`
+pathname=`dirname "$0"`
 help="$script [-h/--help] -- script to connect to wlan with iwd
   Usage:
     depending on how the script is named,
-    it will be executed either with dmenu or with rofi
+    it will be executed either with dmenu, with rofi
+    or wofi.
   Examples:
     dmenu_iwd.sh
-    rofi_iwd.sh"
+    rofi_iwd.sh
+    wofi_iwd.sh"
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     printf "%s\n" "$help"
@@ -18,14 +21,18 @@ function wofi() {
     command wofi -d -I "$@"
 }
 function rofi() {
-    command rofi -m -1 -l 3 -theme solarized -dmenu -i "$@"
+    command rofi -m -1 -dmenu -i "$@"
 }
+function dmenu() {
+    command dmenu "$@"
+}
+
 function ssid-scan(){
-    iwd-scan.py "$@"
+    eval "$pathname/iwd-scan.py $@"
 }
 
 case $script in
-    dmenu-*)
+    dmenu_*)
         label_interface="interface »"
         menu_interface="dmenu -l 3 -c -bw 2 -r -i"
         label_ssid="ssid »"
@@ -33,13 +40,21 @@ case $script in
         label_psk="passphrase »"
         menu_psk="dmenu -l 1 -c -bw 2 -i"
         ;;
-    wofi-*)
+    rofi_*)
         label_interface=""
-        menu_interface="wofi -d -I"
+        menu_interface="rofi -l 3"
         label_ssid=""
-        menu_ssid="wofi -d -I"
+        menu_ssid="rofi"
         label_psk=""
-        menu_psk="wofi -d -I"
+        menu_psk="rofi -I"
+        ;;
+    wofi_*)
+        label_interface=""
+        menu_interface="wofi -l 3"
+        label_ssid=""
+        menu_ssid="wofi"
+        label_psk=""
+        menu_psk="wofi -I"
         ;;
     *)
         printf "%s\n" "$help"
@@ -56,7 +71,7 @@ get_interface() {
     interface=$(iwctl device list \
         | remove_escape_sequences \
         | awk '{printf("%-12s %-9s %s\n", $1, $2, $3)}' \
-        | wofi -p "$label_interface" \
+        | eval "$menu_interface -p $label_interface" \
         | awk '{print $1}'
     )
     [ -n "$interface" ] \
@@ -70,7 +85,7 @@ scan_ssid() {
 get_ssid() {
 
     select=$(printf "🔁[RESCAN]\n%s" "$scan_result" \
-        | wofi -p "$label_ssid" \
+        | eval "$menu_ssid -p $label_ssid" \
     )
 
 
@@ -106,7 +121,7 @@ get_ssid() {
 
 get_psk() {
     psk=$(printf 'press esc or enter if you had already insert a passphrase before!\n' \
-        | wofi -p "$label_psk" \
+        | eval "$menu_psk -p $label_psk" \
     )
 }
 
