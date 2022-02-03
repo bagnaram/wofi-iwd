@@ -1,6 +1,6 @@
 #+TITLE: wofi-iwd
 
-This is a [[https://hg.sr.ht/~scoopta/wofi][Wofi]] (dmenu) interface for iwd for use connecting to networks. It
+This is a [[https://github.com/davatorium/rofi][Rofi]]/[[https://hg.sr.ht/~scoopta/wofi][Wofi]] (dmenu) interface for iwd for use connecting to networks. It
 comes with a dbus-based helper script to provide raw SSIDs. This is to ease the
 formatting required because SSIDs can contain any data.
 
