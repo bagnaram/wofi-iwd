@@ -10,6 +10,7 @@ help="$script [-h/--help] -- script to connect to wlan with iwd
   Examples:
     dmenu_iwd.sh
     rofi_iwd.sh
+    fuzzel_iwd.sh
     wofi_iwd.sh"
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -26,6 +27,9 @@ function rofi() {
 function dmenu() {
     command dmenu "$@"
 }
+function fuzzel() {
+    command fuzzel -f Iosevka:size=8 -w 80 -d "$@"
+}
 
 function ssid-scan(){
     eval "$pathname/iwd-scan.py $@"
@@ -34,27 +38,35 @@ function ssid-scan(){
 case $script in
     dmenu_*)
         label_interface="interface »"
-        menu_interface="dmenu -l 3 -c -bw 2 -r -i"
+        menu_interface="dmenu -l 3 -c -bw 2 -r -i -p $label_interface"
         label_ssid="ssid »"
-        menu_ssid="dmenu -l 10 -c -bw 2 -r -i"
+        menu_ssid="dmenu -l 10 -c -bw 2 -r -i -p $label_ssid"
         label_psk="passphrase »"
-        menu_psk="dmenu -l 1 -c -bw 2 -i"
+        menu_psk="dmenu -l 1 -c -bw 2 -i -p $label_psk"
         ;;
     rofi_*)
         label_interface=""
-        menu_interface="rofi -l 3"
+        menu_interface="rofi -l 3 -p $label_interface"
         label_ssid=""
-        menu_ssid="rofi"
+        menu_ssid="rofi -p $label_ssid"
         label_psk=""
-        menu_psk="rofi -I"
+        menu_psk="rofi -I -p $label_psk"
         ;;
     wofi_*)
         label_interface=""
-        menu_interface="wofi -l 3"
+        menu_interface="wofi -l 3 -p $label_interface"
         label_ssid=""
-        menu_ssid="wofi"
+        menu_ssid="wofi -p $label_ssid"
         label_psk=""
-        menu_psk="wofi -I"
+        menu_psk="wofi -I -p $label_psk"
+        ;;
+    fuzzel_*)
+        label_interface=""
+        menu_interface="fuzzel -P $label_interface"
+        label_ssid=""
+        menu_ssid="fuzzel -P $label_ssid"
+        label_psk=""
+        menu_psk="fuzzel -I -P $label_psk"
         ;;
     *)
         printf "%s\n" "$help"
@@ -71,7 +83,7 @@ get_interface() {
     interface=$(iwctl device list \
         | remove_escape_sequences \
         | awk '{printf("%-12s %-9s %s\n", $1, $2, $3)}' \
-        | eval "$menu_interface -p $label_interface" \
+        | eval $menu_interface \
         | awk '{print $1}'
     )
     [ -n "$interface" ] \
@@ -85,7 +97,7 @@ scan_ssid() {
 get_ssid() {
 
     select=$(printf "🔁[RESCAN]\n%s" "$scan_result" \
-        | eval "$menu_ssid -p $label_ssid" \
+        | eval $menu_ssid \
     )
 
 
@@ -121,7 +133,7 @@ get_ssid() {
 
 get_psk() {
     psk=$(printf 'press esc or enter if you had already insert a passphrase before!\n' \
-        | eval "$menu_psk -p $label_psk" \
+        | eval $menu_psk \
     )
 }
 
