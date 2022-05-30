@@ -28,17 +28,36 @@ function dmenu() {
     command dmenu "$@"
 }
 function fuzzel() {
-    command fuzzel -f Iosevka:size=8 -w 80 -d "$@"
+    command fuzzel -f Iosevka:size=8 -w 82 -d "$@"
 }
 
 function ssid-scan(){
     eval "$pathname/iwd-scan.py $@"
 }
 
+function percentage() {
+  if [[ -z "$strength" ]]
+  then
+      return
+  fi
+
+  offset=$(( $strength + 110 ))
+  progress=$(( $offset * 100 / 180 ))
+
+  progress=""
+  k=$(( $offset / 10))
+  echo $offset $k
+  progress="["
+  for ((ii = 0 ; ii <= k; ii++)); do progress="$progress█"; done
+  for ((j = ii ; j <= 10 ; j++)); do progress="$progress "; done
+  progress="$progress] "
+
+}
+
 case $script in
     dmenu_*)
         label_interface="interface »"
-        menu_interface="dmenu -l 3 -c -bw 2 -r -i -p $label_interface"
+        menu_interface="selection=`dmenu -l 3 -c -bw 2 -r -i -p $label_interface` print ${selection%% *}"
         label_ssid="ssid »"
         menu_ssid="dmenu -l 10 -c -bw 2 -r -i -p $label_ssid"
         label_psk="passphrase »"
@@ -49,7 +68,7 @@ case $script in
         menu_interface="rofi -l 3 -p $label_interface"
         label_ssid=""
         menu_ssid="rofi -p $label_ssid"
-        label_psk=""
+        label_psk="🔒"
         menu_psk="rofi -I -p $label_psk"
         ;;
     wofi_*)
@@ -57,7 +76,7 @@ case $script in
         menu_interface="wofi -l 3 -p $label_interface"
         label_ssid=""
         menu_ssid="wofi -p $label_ssid"
-        label_psk=""
+        label_psk="🔒"
         menu_psk="wofi -I -p $label_psk"
         ;;
     fuzzel_*)
@@ -65,7 +84,7 @@ case $script in
         menu_interface="fuzzel -P $label_interface"
         label_ssid=""
         menu_ssid="fuzzel -P $label_ssid"
-        label_psk=""
+        label_psk="🔒"
         menu_psk="fuzzel -I -P $label_psk"
         ;;
     *)
@@ -91,44 +110,65 @@ get_interface() {
 }
 
 scan_ssid() {
-    scan_result=$(ssid-scan | gawk 'NR%3{printf("%-32ls",$0) ;next;}1')
+    scan_result=("${(@f)$(ssid-scan)}")
+    scan_result_formatted=""
+    for (( i=1; i<$#scan_result; i+=4 ))
+    do
+        ssid=${scan_result[$i]}
+        strength=${scan_result[$i+1]}
+        security=${scan_result[$i+2]}
+        connected=${scan_result[$i+3]}
+
+        if [[ $connected = "1" ]]
+        then
+            connected="✅"
+        else
+            connected="  "
+        fi
+
+        percentage
+        echo $progress
+        printf -v scan_result_formatted "$scan_result_formatted%s%-42ls %s dBm %s       %s\n" $connected $ssid $strength $security $progress
+    done
 }
 
 get_ssid() {
 
-    select=$(printf "🔁[RESCAN]\n%s" "$scan_result" \
-        | eval $menu_ssid \
-    )
-
-
-    if [[ "$select" =~ '^>' ]]
+    select=`echo "🔄[RESCAN]\n"$scan_result_formatted | eval $menu_ssid`
+    if [[ -z "$select" ]]
     then
-        notify-send.sh "iNet wireless daemon" "Already connected to this network."
-        exit 0
-    elif [[ "$select" =~ 'open *$' ]]
+        exit
+    elif [[ "$select" = "🔄[RESCAN]" ]]
     then
-        open=1
-    elif [[ "$select" = "🔁[RESCAN]" ]]
-    then
+        # Rescan is always thu first option
         scan_ssid
         get_ssid
         return
-    elif ! [[ -v select ]] || [[ "$select" = "" ]]
-    then
-        exit 1
     fi
 
-    # Get just list of SSIDsin raw
-    ssids=$(ssid-scan ssid)
+    # we have to convert the selected item to an index because not all the menu
+    # script tools support outputting the selected index
+    to_array=(${(f)scan_result_formatted})
+    selectedIndex=${to_array[(Ie)$select]}
+    print $selectedIndex
+    selectedIndex=$(( $(( $selectedIndex - 1 )) * 4 ))
+    selectedIndex=$(( $selectedIndex + 1 ))
 
-    # iterate through raw SSID list to determine which one to connect to
-    while IFS= read -r ssid_list
-    do
-        if [[ $select =~ $ssid_list ]] then
-            ssid=$ssid_list
-            return
-        fi
-    done <<< "$ssids"
+    i_ssid=${scan_result[$selectedIndex]}
+    i_strength=${scan_result[$selectedIndex +1]}
+    i_security=${scan_result[$selectedIndex+2]}
+    i_connected=${scan_result[$selectedIndex+3]}
+
+    if [[ $i_connected = "1" ]]
+    then
+        i_connected="✅"
+    else
+        i_connected="  "
+    fi
+
+    print "found a match $i_ssid"
+    ssid=$i_ssid
+
 }
 
 get_psk() {

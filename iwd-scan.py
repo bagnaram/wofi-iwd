@@ -75,8 +75,9 @@ for path, phy in root.children.items():
                 properties2 = objects[path3]['net.connman.iwd.Network']
 
                 if len(sys.argv) !=2 or (len(sys.argv) == 2 and sys.argv[1] != 'ssid'):
-                    print("%s%ls" % ( ">" if properties2['Connected'] == 1 else " ",properties2['Name'], ))
-                    print("%i dBm" % (rssi / 100,))
+                    print("%ls" % (properties2['Name'], ))
+                    print("%i" % (rssi / 100,))
                     print("%s" % (properties2['Type'],))
+                    print("%s" % ( properties2['Connected'], ))
                 else:
                     print("%ls" % (properties2['Name'],))

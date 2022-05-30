@@ -6,7 +6,7 @@ formatting required because SSIDs can contain any data.
 
 This tool is meant to run in Sway/wlroots based Linux environments.
 
-[[screenshot.jpg]]
+[[screenshot.png]]
 
 * Why
 This was made to make the wifi scanning and connecting experience for IWD users
