@@ -24,7 +24,6 @@ interface. It will prompt for PSK passwords if the network is protected.
 2. wofi/rofi
 3. python3
 4. dbus
-5. notify-send.sh
 
 * Installation
 You can clone this to ~$HOME/bin~ or some place accessible to you PATH and
