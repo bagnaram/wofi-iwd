@@ -1,7 +1,9 @@
 #!/usr/bin/env zsh
+set -ex
 
 script=`basename "$0"`
 pathname=`dirname "$0"`
+
 help="$script [-h/--help] -- script to connect to wlan with iwd
   Usage:
     depending on how the script is named,
@@ -28,7 +30,7 @@ function dmenu() {
     command dmenu "$@"
 }
 function fuzzel() {
-    command fuzzel -f Iosevka:size=8 -w 82 -d "$@"
+    command fuzzel -w 75 -d "$@"
 }
 
 function ssid-scan(){
@@ -81,11 +83,11 @@ case $script in
         ;;
     fuzzel_*)
         label_interface=""
-        menu_interface="fuzzel -P $label_interface"
+        menu_interface="fuzzel -p $label_interface"
         label_ssid=""
-        menu_ssid="fuzzel -P $label_ssid"
+        menu_ssid="fuzzel -p $label_ssid"
         label_psk="🔒"
-        menu_psk="fuzzel -I -P $label_psk"
+        menu_psk="fuzzel -I -p $label_psk"
         ;;
     *)
         printf "%s\n" "$help"
@@ -128,7 +130,7 @@ scan_ssid() {
 
         percentage
         echo $progress
-        printf -v scan_result_formatted "$scan_result_formatted%s%-42ls %s dBm %s       %s\n" $connected $ssid $strength $security $progress
+        printf -v scan_result_formatted "$scan_result_formatted%s%-42ls %s dBm   %-6s   %s\n" $connected $ssid $strength $security $progress
     done
 }
 
